@@ -61,7 +61,7 @@ export function QuestionForm({ onSubmit, isLoading }: QuestionFormProps) {
               Processing...
             </>
           ) : (
-            "Ask CovenantAI"
+            "Ask Covenant Chat" // Updated button text
           )}
         </Button>
       </form>

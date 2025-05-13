@@ -15,7 +15,7 @@ const geistSans = Geist({
 // });
 
 export const metadata: Metadata = {
-  title: 'CovenantAI',
+  title: 'Covenant Chat', // Updated title
   description: 'AI-powered Q&A for HOA covenant documents',
 };
 

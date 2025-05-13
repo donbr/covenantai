@@ -39,7 +39,7 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
             </AlertDescription>
           </Alert>
         )}
-        
+
         <div>
           <h3 className="text-lg font-semibold mb-2 text-foreground/90">Summary:</h3>
           <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{summary || "No summary available."}</p>
@@ -57,7 +57,7 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
             This score represents the AI's confidence in the provided summary based on the available document sections.
           </p>
         </div>
-        
+
         <Separator />
 
         <Accordion type="single" collapsible className="w-full">
@@ -80,7 +80,7 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
       </CardContent>
       <CardFooter>
         <CardDescription className="text-xs italic">
-          CovenantAI provides information based on covenant documents. Always refer to the official documents or consult with the HOA board for definitive guidance.
+          Covenant Chat provides information based on covenant documents. Always refer to the official documents or consult with the HOA board for definitive guidance. {/* Updated name */}
         </CardDescription>
       </CardFooter>
     </Card>

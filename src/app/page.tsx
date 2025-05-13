@@ -39,7 +39,7 @@ export default function CovenantQAPage() {
       <header className="mb-10 text-center">
         <div className="flex items-center justify-center space-x-3 mb-2">
           <BookText className="h-12 w-12 text-primary" />
-          <h1 className="text-5xl font-bold tracking-tight">CovenantAI</h1>
+          <h1 className="text-5xl font-bold tracking-tight">Covenant Chat</h1> {/* Updated name */}
         </div>
         <p className="text-xl text-muted-foreground">
           Your AI-powered assistant for understanding HOA covenant documents.
@@ -55,7 +55,7 @@ export default function CovenantQAPage() {
           <section className="space-y-6">
             <div className="flex items-center justify-center text-primary py-4">
               <Loader2 className="h-8 w-8 animate-spin mr-3" />
-              <span className="text-lg font-semibold">CovenantAI is thinking...</span>
+              <span className="text-lg font-semibold">Covenant Chat is thinking...</span> {/* Updated name */}
             </div>
             <Skeleton className="h-12 w-1/3 mx-auto" />
             <Skeleton className="h-24 w-full" />
@@ -85,7 +85,7 @@ export default function CovenantQAPage() {
 
       <footer className="mt-16 text-center text-sm text-muted-foreground w-full max-w-3xl">
         <Separator className="my-6" />
-        <p>&copy; {new Date().getFullYear()} CovenantAI. For informational purposes only.</p>
+        <p>&copy; {new Date().getFullYear()} Covenant Chat. For informational purposes only.</p> {/* Updated name */}
         <p>Always consult official HOA documents and personnel for binding decisions.</p>
       </footer>
 
