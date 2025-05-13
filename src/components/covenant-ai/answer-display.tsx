@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,7 +43,9 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
 
         <div>
           <h3 className="text-lg font-semibold mb-2 text-foreground/90">Summary:</h3>
-          <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{summary || "No summary available."}</p>
+          <div className="prose prose-sm max-w-none text-muted-foreground leading-relaxed">
+            <ReactMarkdown>{summary || "No summary available."}</ReactMarkdown>
+          </div>
         </div>
 
         <Separator />
@@ -70,9 +73,9 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
             </AccordionTrigger>
             <AccordionContent>
               <div className="mt-2 p-4 bg-secondary/50 rounded-md border max-h-96 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-sm text-secondary-foreground leading-relaxed font-mono">
-                  {relevantSections || "No specific sections were highlighted for this query."}
-                </pre>
+                <div className="prose prose-sm max-w-none text-secondary-foreground leading-relaxed font-mono">
+                   <ReactMarkdown>{relevantSections || "No specific sections were highlighted for this query."}</ReactMarkdown>
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -80,7 +83,7 @@ export function AnswerDisplay({ summary, confidence, relevantSections }: AnswerD
       </CardContent>
       <CardFooter>
         <CardDescription className="text-xs italic">
-          Covenant Chat provides information based on covenant documents. Always refer to the official documents or consult with the HOA board for definitive guidance. {/* Updated name */}
+          Covenant Chat provides information based on covenant documents. Always refer to the official documents or consult with the HOA board for definitive guidance.
         </CardDescription>
       </CardFooter>
     </Card>
