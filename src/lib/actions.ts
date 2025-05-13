@@ -32,7 +32,7 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
     let markdownQAUsed = false;
     let markdownQAAnswer: MarkdownQAResponse | null = null;
     try {
-      const markdownContent = await fs.readFile('/home/user/studio/docs/ambrose-lake-covenants-marker.md', 'utf-8');
+      const markdownContent = await fs.readFile('docs/ambrose-lake-covenants-marker.md', 'utf-8');
       markdownQAAnswer = await handleMarkdownQASubmission(question, markdownContent);
       if (markdownQAAnswer.foundInDocument) {
         markdownQAUsed = true;
