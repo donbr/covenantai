@@ -1,3 +1,4 @@
+
 // src/lib/actions.ts
 "use server";
 
@@ -22,7 +23,10 @@ export interface MarkdownQAResponse {
 }
 
 export async function handleQuestionSubmission(question: string): Promise<AIResponse> {
+  console.log("[actions.ts] handleQuestionSubmission called with question:", question);
+
   if (!question.trim()) {
+    console.error("[actions.ts] Question is empty.");
     throw new Error("Question cannot be empty.");
   }
 
@@ -32,13 +36,17 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
     let markdownQAUsed = false;
     let markdownQAAnswer: MarkdownQAResponse | null = null;
     try {
+      console.log("[actions.ts] Attempting Markdown Q&A.");
       const markdownContent = await fs.readFile('docs/ambrose-lake-covenants-marker.md', 'utf-8');
       markdownQAAnswer = await handleMarkdownQASubmission(question, markdownContent);
       if (markdownQAAnswer.foundInDocument) {
+        console.log("[actions.ts] Answer found in Markdown document.");
         markdownQAUsed = true;
+      } else {
+        console.log("[actions.ts] Answer not found in Markdown document or low confidence.");
       }
     } catch (markdownError) {
-      console.error("Error processing Markdown Q&A, falling back to general search:", markdownError);
+      console.error("[actions.ts] Error processing Markdown Q&A, falling back to general search:", markdownError);
       // Continue to the original flow if Markdown Q&A fails
     }
 
@@ -47,21 +55,20 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
       return {
         summary: markdownQAAnswer.answer,
         confidence: 1, // Assume high confidence if found in the specific document
-        relevantSections: markdownQAAnswer.citations?.join('\n') || "No specific citations provided.",
+        relevantSections: markdownQAAnswer.citations?.join('\n\n') || "No specific citations provided.",
       };
     } else {
-      // Step 1: Search for relevant sections (Assuming this searches pre-indexed covenant data)
+      console.log("[actions.ts] Markdown Q&A did not yield a definitive answer. Proceeding to general search and summarization.");
+      // Step 1: Search for relevant sections
       const searchInput: CovenantSearchInput = { question };
-      // TODO: The covenantSearch flow needs actual implementation to search documents.
-      // For now, it might return placeholder or dummy data based on its current prompt.
-      // const searchResult: CovenantSearchOutput = await covenantSearch(searchInput);    
-      // Placeholder until covenantSearch is fully implemented
-      const searchResult: CovenantSearchOutput = { answer: `Placeholder relevant section for question: ${question}` };
-      console.warn("Using placeholder data for covenant search results.");
+      console.log("[actions.ts] Calling covenantSearch flow with input:", searchInput);
+      const searchResult: CovenantSearchOutput = await covenantSearch(searchInput);    
+      console.log("[actions.ts] covenantSearch flow result:", searchResult);
       
-      if (!searchResult.answer) {
+      if (!searchResult.answer || searchResult.answer.trim() === "") {
+        console.warn("[actions.ts] No relevant sections found by covenantSearch.");
         return {
-          summary: "No relevant sections found in the covenant documents for your question.",
+          summary: "No relevant sections found in the covenant documents for your question using the general search.",
           confidence: 0,
           relevantSections: "N/A",
         };
@@ -72,8 +79,10 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
         question,
         relevantSections: searchResult.answer,
       };
-      
+      console.log("[actions.ts] Calling summarizeCovenant flow with input:", summarizeInput);
       const summarizationResult: SummarizeCovenantOutput = await summarizeCovenant(summarizeInput);
+      console.log("[actions.ts] summarizeCovenant flow result:", summarizationResult);
+
       return {
         summary: summarizationResult.summary,
         confidence: summarizationResult.confidence,
@@ -81,7 +90,7 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
       };
     }
   } catch (error) {
-    console.error("Error processing covenant question with AI:", error);
+    console.error("[actions.ts] Error processing covenant question with AI:", error);
     if (error instanceof Error) {
       throw new Error(`An error occurred while processing your covenant question: ${error.message}`);
     }
@@ -96,16 +105,21 @@ export async function handleQuestionSubmission(question: string): Promise<AIResp
  * @returns A promise that resolves to the AI's answer and citation details.
  */
 export async function handleMarkdownQASubmission(question: string, markdownContent: string): Promise<MarkdownQAResponse> {
+  console.log("[actions.ts] handleMarkdownQASubmission called with question:", question);
   if (!question.trim()) {
+    console.error("[actions.ts] Markdown Q&A: Question is empty.");
     throw new Error("Question cannot be empty.");
   }
   if (!markdownContent.trim()) {
+    console.error("[actions.ts] Markdown Q&A: Markdown content is empty.");
     throw new Error("Markdown content cannot be empty.");
   }
 
   try {
     const input: MarkdownQAInput = { question, markdownContent };
+    console.log("[actions.ts] Calling markdownQA flow with input:", input.question);
     const result: MarkdownQAOutput = await markdownQA(input);
+    console.log("[actions.ts] markdownQA flow result:", result);
 
     return {
       answer: result.answer,
@@ -113,7 +127,7 @@ export async function handleMarkdownQASubmission(question: string, markdownConte
       citations: result.citations,
     };
   } catch (error) {
-    console.error("Error processing Markdown Q&A:", error);
+    console.error("[actions.ts] Error processing Markdown Q&A:", error);
     if (error instanceof Error) {
       throw new Error(`An error occurred while processing your Markdown question: ${error.message}`);
     }
