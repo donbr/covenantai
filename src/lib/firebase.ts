@@ -12,22 +12,38 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp;
+let app: FirebaseApp | null = null;
 let performance: FirebasePerformance | null = null;
 
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
+if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+  console.error(
+    "**********************************************************************************************************************\n" +
+    "IMPORTANT: Firebase API Key is missing or is still set to the placeholder 'YOUR_API_KEY'.\n" +
+    "Please update your .env file with your actual Firebase project credentials for 'NEXT_PUBLIC_FIREBASE_API_KEY'.\n" +
+    "Firebase will not be initialized, and Firebase-dependent features will not work.\n" +
+    "**********************************************************************************************************************"
+  );
 } else {
-  app = getApps()[0];
-}
+  if (getApps().length === 0) {
+    try {
+      app = initializeApp(firebaseConfig);
+    } catch (e) {
+      console.error("Firebase initialization failed:", e);
+      // app remains null
+    }
+  } else {
+    app = getApps()[0];
+  }
 
-// Initialize Performance Monitoring only on the client side
-if (typeof window !== 'undefined') {
-  try {
-    performance = getPerformance(app);
-    console.log('Firebase Performance Monitoring initialized.');
-  } catch (error) {
-    console.error('Error initializing Firebase Performance Monitoring:', error);
+  // Initialize Performance Monitoring only on the client side and if app was successfully initialized
+  if (app && typeof window !== 'undefined') {
+    try {
+      performance = getPerformance(app);
+      console.log('Firebase Performance Monitoring initialized.');
+    } catch (error) {
+      console.error('Error initializing Firebase Performance Monitoring:', error);
+      // performance will remain null
+    }
   }
 }
 

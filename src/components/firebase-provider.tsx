@@ -2,8 +2,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { app, performance as initializedPerformance } from '@/lib/firebase'; // Imports initialized app and attempts to import initialized performance
-// Firebase Performance is initialized in firebase.ts, we just need to ensure this provider is rendered.
+import { app, performance as initializedPerformance, firebaseConfig } from '@/lib/firebase';
 
 interface FirebaseProviderProps {
   children: React.ReactNode;
@@ -11,14 +10,27 @@ interface FirebaseProviderProps {
 
 export function FirebaseProvider({ children }: FirebaseProviderProps) {
   useEffect(() => {
-    // The firebase.ts file already initializes performance monitoring on the client side.
-    // This effect hook is here to ensure this client component is rendered,
-    // which in turn ensures firebase.ts is executed on the client.
-    // Log to confirm provider is active.
-    if (initializedPerformance) {
-      console.log('FirebaseProvider mounted, Performance Monitoring should be active.');
-    } else if (typeof window !== 'undefined') {
-      console.warn('FirebaseProvider mounted, but Performance Monitoring was not initialized. This might happen if firebase.ts had an issue or during SSR if not properly guarded.');
+    if (typeof window !== 'undefined') { // Ensure this runs only on client
+      if (initializedPerformance) {
+        console.log('FirebaseProvider mounted, Performance Monitoring is active.');
+      } else if (!app && (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY")) {
+        // This case is largely handled by the direct console.error in firebase.ts,
+        // but we can add a follow-up warning here if needed or for completeness.
+        console.warn(
+          "FirebaseProvider mounted: Firebase app was not initialized because the API key in .env is likely missing or still the placeholder 'YOUR_API_KEY'. " +
+          "Performance Monitoring cannot be active. Please provide a valid NEXT_PUBLIC_FIREBASE_API_KEY in your .env file."
+        );
+      } else if (!app) {
+        console.warn(
+          "FirebaseProvider mounted: Firebase app was not initialized. This could be due to an invalid API key (that is not the placeholder) or other Firebase configuration issues in .env. " +
+          "Performance Monitoring cannot be active."
+        );
+      } else if (app && !initializedPerformance) {
+        console.warn(
+          'FirebaseProvider mounted: Firebase app is initialized, but Performance Monitoring could not be. ' +
+          'Check for errors during performance initialization in firebase.ts or the console.'
+        );
+      }
     }
   }, []);
 
