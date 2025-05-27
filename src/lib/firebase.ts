@@ -1,5 +1,6 @@
 // src/lib/firebase.ts
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getAnalytics, type Analytics } from 'firebase/analytics';
 import { getPerformance, type FirebasePerformance } from 'firebase/performance';
 
 const firebaseConfig = {
@@ -13,6 +14,7 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp | null = null;
+let analytics: Analytics | null = null;
 let performance: FirebasePerformance | null = null;
 
 if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
@@ -35,16 +37,25 @@ if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
     app = getApps()[0];
   }
 
-  // Initialize Performance Monitoring only on the client side and if app was successfully initialized
+  // Initialize Firebase products only on the client side and if app was successfully initialized
   if (app && typeof window !== 'undefined') {
+    // Initialize Performance Monitoring
     try {
       performance = getPerformance(app);
       console.log('Firebase Performance Monitoring initialized.');
     } catch (error) {
       console.error('Error initializing Firebase Performance Monitoring:', error);
-      // performance will remain null
     }
+
+    // Initialize Analytics
+    try {
+      analytics = getAnalytics(app);
+      console.log('Firebase Analytics initialized.');
+    } catch (error) {
+      console.error('Error initializing Firebase Analytics:', error);
+    }
+
   }
 }
 
-export { app, performance, firebaseConfig };
+export { app, analytics, performance, firebaseConfig };
