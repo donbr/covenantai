@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -27,7 +28,7 @@ const nextConfig: NextConfig = {
     // This prevents "Module not found" warnings during the build if these aren't installed.
     // These are typically required dynamically based on environment variables,
     // and if not used, they can be safely aliased to false.
-    config.resolve.alias['@opentelemetry/exporter-jaeger'] = false;
+    // config.resolve.alias['@opentelemetry/exporter-jaeger'] = false; // Removed as it's now installed
     config.resolve.alias['@opentelemetry/exporter-zipkin'] = false;
     // You could add others here if more warnings appear, e.g.:
     // config.resolve.alias['@opentelemetry/exporter-otlp-grpc'] = false;
