@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { app, performance as initializedPerformance, firebaseConfig } from '@/lib/firebase';
+import { getFirebaseApp, getFirebasePerformance, getFirebaseAnalytics, firebaseConfig } from '@/lib/firebase';
 
 interface FirebaseProviderProps {
   children: React.ReactNode;
@@ -11,25 +11,32 @@ interface FirebaseProviderProps {
 export function FirebaseProvider({ children }: FirebaseProviderProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') { // Ensure this runs only on client
-      if (initializedPerformance) {
-        console.log('FirebaseProvider mounted, Performance Monitoring is active.');
-      } else if (!app && (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY")) {
-        // This case is largely handled by the direct console.error in firebase.ts,
-        // but we can add a follow-up warning here if needed or for completeness.
-        console.warn(
-          "FirebaseProvider mounted: Firebase app was not initialized because the API key in .env is likely missing or still the placeholder 'YOUR_API_KEY'. " +
-          "Performance Monitoring cannot be active. Please provide a valid NEXT_PUBLIC_FIREBASE_API_KEY in your .env file."
-        );
-      } else if (!app) {
-        console.warn(
-          "FirebaseProvider mounted: Firebase app was not initialized. This could be due to an invalid API key (that is not the placeholder) or other Firebase configuration issues in .env. " +
-          "Performance Monitoring cannot be active."
-        );
-      } else if (app && !initializedPerformance) {
-        console.warn(
-          'FirebaseProvider mounted: Firebase app is initialized, but Performance Monitoring could not be. ' +
-          'Check for errors during performance initialization in firebase.ts or the console.'
-        );
+      // Attempt to initialize Firebase services by calling their getters.
+      // The actual initialization logic and detailed logging are now within firebase.ts.
+      const app = getFirebaseApp();
+      
+      if (app) {
+        console.log('FirebaseProvider: App instance available/initialized.');
+        // Initialize Performance Monitoring
+        const performance = getFirebasePerformance();
+        if (performance) {
+          console.log('FirebaseProvider: Performance Monitoring instance available/initialized.');
+        } else {
+          // Warning for performance might be logged from firebase.ts if there was an issue
+        }
+
+        // Initialize Analytics
+        const analytics = getFirebaseAnalytics();
+        if (analytics) {
+          // Analytics init is async due to isSupported(), so instance might be null here immediately
+          // but will be set. Log from firebase.ts confirms actual initialization.
+          console.log('FirebaseProvider: Analytics initialization process started.');
+        } else {
+           // Warning for analytics might be logged from firebase.ts
+        }
+      } else {
+        // Errors regarding API key or Project ID missing would have been logged by firebase.ts
+        console.warn('FirebaseProvider: Firebase app could not be initialized. Check console for details from firebase.ts.');
       }
     }
   }, []);
